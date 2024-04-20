@@ -403,7 +403,7 @@ const AddEditStudent = ({ onOpenChange, open }: AddEditStudentProps) => {
               <div className="w-full flex flex-row items-center justify-start mt-2 gap-2">
                 <DialogFooter className="flex gap-2 flex-row">
                   <Button disabled={false} type="submit" onClick={() => {}}>
-                    {true ? <Loader /> : "Save"}
+                    {false ? <Loader /> : "Save"}
                   </Button>
                   <Button
                     className="bg-[#FFFFFF] text-[#1E293B] border hover:bg-[#FFFFFF] hover:text-[#1E293B]"
