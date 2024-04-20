@@ -1,6 +1,7 @@
 import axios from "axios";
 import { BASE_URL } from "../Utils/constants";
 import {
+  LectureInput,
   LoginCredentials,
   Subject,
   validationSchema,
@@ -59,7 +60,11 @@ export const updateTeacher = async (
   Object.entries(payload).forEach(([key, value]) => {
     formData.append(key, JSON.stringify(value));
   });
-  return await axios.put(`${BASE_URL}admin/teacher?teacherId=${teacherId}`, formData, config);
+  return await axios.put(
+    `${BASE_URL}admin/teacher?teacherId=${teacherId}`,
+    formData,
+    config
+  );
 };
 export const getTeacher = async (token: string, checked?: boolean) => {
   const config = getAuthorizationConfig(token);
@@ -84,4 +89,14 @@ export const getTeacherById = async (token: string, teacherId: string) => {
     `${BASE_URL}admin/teacherById?teacherId=${teacherId}`,
     config
   );
+};
+export const createLecture = async (token: string, payload: LectureInput) => {
+  const config = getAuthorizationConfig(token);
+
+  return await axios.post(`${BASE_URL}admin/createLecture`, payload, config);
+};
+export const getLectures = async (token: string) => {
+  const config = getAuthorizationConfig(token);
+
+  return await axios.get(`${BASE_URL}admin/getLectures`, config);
 };

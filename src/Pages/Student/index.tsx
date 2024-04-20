@@ -8,6 +8,7 @@ import AgGrid from "../../Components/Grid";
 import { useNavigate } from "react-router-dom";
 import AddEditTeacher from "../../Components/models/addEditTeacher";
 import ConfirmPopup from "../../Components/ComonComponents/ConfirmPopup";
+import AddEditStudent from "../../Components/models/addEditStudent";
 
 const Students = () => {
   const [showTeacherPopup, setTeacherPopup] = useState(false);
@@ -158,13 +159,12 @@ const Students = () => {
             </div>
             <Button onClick={() => setTeacherPopup(true)}>Add Student</Button>
           </div>
-          {/* {showTeacherPopup && (
-            <AddEditTeacher
-              getAllTechersData={() => {}}
+          {showTeacherPopup && (
+            <AddEditStudent
               open={showTeacherPopup}
               onOpenChange={() => setTeacherPopup(false)}
             />
-          )} */}
+          )}
         </div>
       </div>
       <div className="p-[21px] !pt-0">

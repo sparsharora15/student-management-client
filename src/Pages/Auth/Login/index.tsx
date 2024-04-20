@@ -18,6 +18,7 @@ import { Input } from "../../../Components/ui/input";
 import { Button } from "../../../Components/ui/button";
 import Loader from "../../../Components/loader";
 import { login } from "../../../HttpServices";
+import { toast } from "../../../Components/ui/use-toast";
 const loginFormSchema = z.object({
   email: z
     .string()
@@ -51,9 +52,17 @@ const Login = () => {
       if (response?.data?.status === 200) {
         localStorage.setItem("adminToken", response.data.token);
         navigate("/");
+        toast({
+          variant: "success",
+          title: response?.data.message,
+        })
       }
     } catch (err: any) {
-      // showToast(err?.response?.data?.message, "error");
+      console.log(err.response?.data?.message)
+      toast({
+        variant: "destructive",
+        title: err?.response?.data?.message,
+      })
     } finally {
       setLoading(false);
     }
@@ -109,7 +118,7 @@ const Login = () => {
                   )}
                 />
 
-                <Button type="submit" className="w-full bg-[#0F172A]">
+                <Button disabled={loading} type="submit" className="w-full bg-[#0F172A]">
                   {!loading ? "Login" : <Loader />}
                 </Button>
               </form>

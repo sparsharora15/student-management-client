@@ -48,7 +48,7 @@ const SideBar = () => {
           <li
             onClick={() => {
               localStorage.removeItem("adminToken");
-              navigate('/')
+              navigate('/login')
             }}
             className={`font-semibold flex items-center gap-3 rounded-[6px] py-[8px] px-[13px] text-[20px] hover:bg-primary text-[#0F172A] hover:text-[#FFFFFF] `}
           >

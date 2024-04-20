@@ -28,7 +28,7 @@ import {
 import { Input } from "../ui/input";
 import { toast } from "../ui/use-toast";
 
-interface AddEditOrganization {
+interface AddEditTeacherProps {
   open: boolean;
   onOpenChange: () => void;
   getAllTechersData: () => void;
@@ -63,11 +63,8 @@ const validationSchema = z.object({
         const date = new Date(value);
         return !isNaN(date.getTime());
       }),
-    ])
-    .refine((dob) => isNotFutureDate(dob as Date), {
-      message: "Date of birth cannot be a future date.",
-    }),
-
+    ]),
+  
   gender: z.object({
     label: z.string(),
     value: z.string(),
@@ -115,7 +112,7 @@ const AddEditTeacher = ({
   getAllTechersData,
   teacherId,
   teacherData,
-}: AddEditOrganization) => {
+}: AddEditTeacherProps) => {
   const token = localStorage.getItem("adminToken");
   const [userPicture, setUserPicture] = useState<File | string>();
   const [imageChange, setImageChange] = useState<boolean>(false);

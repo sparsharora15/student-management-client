@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Button } from "../../Components/ui/button";
 import SearchBar from "../../Components/ComonComponents/searchBar";
 import { Label } from "../../Components/ui/label";
@@ -7,11 +7,18 @@ import { useNavigate } from "react-router-dom";
 import GridActions from "../../Components/gridCellRendrer/GridActions";
 import AgGrid from "../../Components/Grid";
 import AddEditLectureSlots from "../../Components/models/addEditLectureSlots";
-
+import { getLectures } from "../../HttpServices";
+interface Lectures{
+  lectureNumber:number
+  endTime:string
+  startTime:string
+}
 const TimeSlots = () => {
   const [lecturePopup, setLecturePopup] = useState(false);
+  const token = localStorage.getItem("adminToken");
   const navigate = useNavigate();
   const [action, setAction] = useState("");
+  const [lectures, setLectures] = useState<Lectures[]>([]);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const deleteUser = useCallback((gridParams: any) => {
     setAction("Archive");
@@ -57,7 +64,7 @@ const TimeSlots = () => {
     () => [
       {
         headerName: "Lecture",
-        field: "lecture",
+        field: "lectureNumber",
         headerClass: "ag-header-custom1 ",
         tooltipField: "lecture",
         minWidth: 100,
@@ -68,7 +75,7 @@ const TimeSlots = () => {
 
       {
         headerName: "From",
-        field: "from",
+        field: "startTime",
         headerClass: "ag-header-custom",
         tooltipField: "from",
         minWidth: 110,
@@ -77,7 +84,7 @@ const TimeSlots = () => {
       },
       {
         headerName: "To",
-        field: "to",
+        field: "endTime",
         headerClass: "ag-header-custom",
         tooltipField: "to",
         minWidth: 110,
@@ -89,6 +96,18 @@ const TimeSlots = () => {
     ],
     []
   );
+
+  const getSlots = async () => {
+    try {
+      const response = await getLectures(token as string);
+      console.log(response.status === 200);
+      if (response.status === 200) {
+        setLectures(response.data?.data[0].lectures);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
   const rowData = [
     {
       lecture: "1",
@@ -112,6 +131,9 @@ const TimeSlots = () => {
       return "!bg-red-50";
     }
   };
+  useEffect(() => {
+    getSlots();
+  }, []);
   return (
     <>
       <div className="p-[21px] !pb-0 flex flex-col lg:flex-row items-center justify-between gap-4">
@@ -151,10 +173,10 @@ const TimeSlots = () => {
               <> */}
         <AgGrid
           className="py-8"
-          height="58vh"
+          height="72vh"
           columnDefs={columnDefs}
           getRowClass={getRowClass}
-          rowData={rowData}
+          rowData={lectures}
         />
         {/* </>
             )} */}

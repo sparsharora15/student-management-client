@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import SelectDropdown from "../ComonComponents/selectDropdown";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { toast } from "react-toastify";
 import * as z from "zod";
 
 import {
@@ -17,6 +16,9 @@ import {
 } from "../ui/form";
 import { validatePhoneNumber, validateUserName } from "../../Utils/regex";
 import { Input } from "../ui/input";
+import { createLecture } from "../../HttpServices";
+import Loader from "../loader";
+import { toast } from "../ui/use-toast";
 
 interface AddEditLectureSlot {
   open: boolean;
@@ -39,6 +41,8 @@ const validationSchema = z.object({
 });
 
 const AddEditLectureSlots = ({ open, onOpenChange }: AddEditLectureSlot) => {
+  const token = localStorage.getItem("adminToken");
+  const [loading, setLoading] = useState<boolean>(false);
   const form = useForm<z.infer<typeof validationSchema>>({
     resolver: zodResolver(validationSchema),
     defaultValues: {
@@ -52,13 +56,30 @@ const AddEditLectureSlots = ({ open, onOpenChange }: AddEditLectureSlot) => {
 
   const onSubmit = async (values: z.infer<typeof validationSchema>) => {
     try {
-      console.log(values);
-    } catch (err) {}
+      setLoading(true);
+      const response = await createLecture(token as string, values);
+      console.log(response.status === 201);
+      if (response.status === 201) {
+        toast({
+          variant: "success",
+          title: response?.data.message,
+        });
+        onOpenChange()
+      }
+    } catch (err:any) {
+      toast({
+        variant: "destructive",
+        // @ts-ignore
+        title: err?.response?.data.message ,
+      });
+      console.warn(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
     if (!open) {
-      // Reset form when dialog is closed
       form.reset();
     }
   }, [open, form]);
@@ -216,9 +237,10 @@ const AddEditLectureSlots = ({ open, onOpenChange }: AddEditLectureSlot) => {
                             } else {
                               // Clear the value if it's not within college hours
                               field.onChange("");
-                              toast.error(
-                                "Recess time should be within college hours"
-                              );
+                              toast({
+                                variant: "destructive",
+                                title: "Recess time should be within college hours",
+                              });
                             }
                           }}
                         />
@@ -232,7 +254,7 @@ const AddEditLectureSlots = ({ open, onOpenChange }: AddEditLectureSlot) => {
 
             <div className="w-full flex flex-row items-center justify-start mt-2 gap-2">
               <DialogFooter className="flex gap-2 flex-row">
-                <Button type="submit">Save</Button>
+                <Button type="submit">{loading ? <Loader /> : "Save"}</Button>
                 <Button
                   className="bg-[#FFFFFF] text-[#1E293B] border hover:bg-[#FFFFFF] hover:text-[#1E293B]"
                   onClick={onOpenChange}

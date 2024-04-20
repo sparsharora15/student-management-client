@@ -30,6 +30,13 @@ export interface Teacher {
   phoneNo: string;
   profilePicturePublicId: string;
 }
+export interface LectureInput {
+  collegeStartTime: string;
+  collegeEndTime: string;
+  lectureTime: string;
+  recessTimeFrom: string;
+  recessTimeTo: string;
+}
 
 export interface dropDownValues {
   value: string;
