@@ -60,10 +60,7 @@ const validationSchema = z.object({
   bloodGroup: z
     .string()
     .min(1, { message: "Blood group is required" })
-    .max(255, { message: "User Name must be at most 255 characters" })
-    .refine((value) => validateUserName(value), {
-      message: "Special characters are not allowed in the user name.",
-    }),
+    .max(255, { message: "User Name must be at most 255 characters" }),
   email: z
     .string()
     .min(1, { message: "User Email is required." })
@@ -137,6 +134,7 @@ const AddEditStudent = ({ onOpenChange, open ,getAllStudentsData}: AddEditStuden
   });
   const onSubmit = async (values: z.infer<typeof validationSchema>) => {
     try {
+      setLoading(true);
       const {  course, gender, ...rest } = values;
          const newCourse = course.value
 
@@ -158,10 +156,13 @@ const AddEditStudent = ({ onOpenChange, open ,getAllStudentsData}: AddEditStuden
           variant: "success",
           title: res.data.message,
         });
+        onOpenChange()
         getAllStudentsData();
       }
     } catch (err) {
       console.warn(err);
+    }finally{
+      setLoading(false);
     }
   };
   const getCoursesList = async () => {
@@ -205,8 +206,8 @@ const AddEditStudent = ({ onOpenChange, open ,getAllStudentsData}: AddEditStuden
               <div className="w-full  flex flex-col">
                 <p className="text-[#1E293B] font-semibold text-[24px]">
                   {popupType === "edit"
-                    ? "Update Teacher Details"
-                    : "Add Teacher Details"}
+                    ? "Update Student Details"
+                    : "Add Student Details"}
                 </p>
 
                 <div className="grid grid-cols-3 gap-5">
@@ -397,8 +398,8 @@ const AddEditStudent = ({ onOpenChange, open ,getAllStudentsData}: AddEditStuden
               <div className=" grid grid-cols-2 gap-4"></div>
               <div className="w-full flex flex-row items-center justify-start mt-2 gap-2">
                 <DialogFooter className="flex gap-2 flex-row">
-                  <Button disabled={false} type="submit" onClick={() => {}}>
-                    {false ? <Loader /> : "Save"}
+                  <Button disabled={loading} type="submit" onClick={() => {}}>
+                    {loading ? <Loader /> : "Save"}
                   </Button>
                   <Button
                     className="bg-[#FFFFFF] text-[#1E293B] border hover:bg-[#FFFFFF] hover:text-[#1E293B]"

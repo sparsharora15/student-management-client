@@ -1,21 +1,23 @@
-import React, { lazy, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import ConfirmPopup from "../../Components/ComonComponents/ConfirmPopup";
+import SearchBar from "../../Components/ComonComponents/searchBar";
+import AgGrid from "../../Components/Grid";
+import GridActions from "../../Components/gridCellRendrer/GridActions";
+import AddEditStudent from "../../Components/models/addEditStudent";
+import { Button } from "../../Components/ui/button";
 import { Checkbox } from "../../Components/ui/checkbox";
 import { Label } from "../../Components/ui/label";
-import SearchBar from "../../Components/ComonComponents/searchBar";
-import { Button } from "../../Components/ui/button";
-import GridActions from "../../Components/gridCellRendrer/GridActions";
-import AgGrid from "../../Components/Grid";
-import { useNavigate } from "react-router-dom";
-import AddEditTeacher from "../../Components/models/addEditTeacher";
-import ConfirmPopup from "../../Components/ComonComponents/ConfirmPopup";
-import AddEditStudent from "../../Components/models/addEditStudent";
 import { getStudent } from "../../HttpServices";
 import { formatDate } from "../../Utils/helper";
+import { TeachingDepartmentRenderer } from "../Teacher";
+import { TeachingDepartment } from "../../Utils/interface";
 
 const Students = () => {
   const [showTeacherPopup, setTeacherPopup] = useState(false);
   const [action, setAction] = useState("");
-  const [isOpen, setIsOpen] = useState<Boolean>(false); // set initial state of dropdown to closed
+  const [checked, setChecked] = useState<Boolean>(false);
+  const [isOpen, setIsOpen] = useState<Boolean>(false);
   const navigate = useNavigate();
   const [rowData, setRowData] = useState<any[]>([]);
   const token = localStorage.getItem("adminToken");
@@ -51,7 +53,9 @@ const Students = () => {
             title: "View",
             label: "View",
             className: "",
-            callback: () => navigate("/view/5"),
+            callback: () => {
+              navigate(`/view/${gridParams.data._id}`);
+            },
           },
 
           {
@@ -78,7 +82,7 @@ const Students = () => {
       },
       {
         headerName: "Name",
-        field: "name",
+        field: "fullName",
         headerClass: "ag-header-custom",
         tooltipField: "name",
         minWidth: 100,
@@ -97,13 +101,16 @@ const Students = () => {
         sortable: false,
       },
       {
-        headerName: "Department",
-        field: "department",
+        headerName: "Course",
+        field: "course",
         headerClass: "ag-header-custom",
-        tooltipField: "department",
+        tooltipField: "Course",
         minWidth: 110,
         flex: 1,
         sortable: false,
+        cellRenderer: (gridProps: any) => {
+          return TeachingDepartmentRenderer(gridProps.data.course  );
+        },
       },
       {
         headerName: "Address",
@@ -116,7 +123,7 @@ const Students = () => {
       },
       {
         headerName: "Contact number",
-        field: "contactNumber",
+        field: "phoneNo",
         headerClass: "ag-header-custom",
         tooltipField: "contactNumber",
         minWidth: 150,
@@ -148,7 +155,7 @@ const Students = () => {
 
   const getAllStudentsData = async () => {
     try {
-      const res = await getStudent(token as string);
+      const res = await getStudent(token as string, checked as boolean);
       if (res.data.status === 200) {
         const formattedData = res.data.data.map((student: any) => ({
           ...student,
@@ -160,10 +167,11 @@ const Students = () => {
       console.warn(err);
     }
   };
-  
+
   useEffect(() => {
     getAllStudentsData();
-  }, []);
+  }, [checked]);
+
   return (
     <>
       <div className="p-[21px] !pb-0 flex flex-col lg:flex-row items-center justify-between gap-4">
@@ -173,7 +181,12 @@ const Students = () => {
         <div className="flex gap-3 flex-col lg:flex-row w-full justify-end">
           <div className="flex flex-col md:flex-row  justify-end md:justify-between gap-3">
             <div className="items-center flex gap-2">
-              <Checkbox id="archived" />
+              <Checkbox
+                onCheckedChange={(checked) => {
+                  setChecked(checked as boolean);
+                }}
+                id="archived"
+              />{" "}
               <Label htmlFor="archived">Show Archived</Label>
             </div>
             <div className="w-full lg:w-[200px]">

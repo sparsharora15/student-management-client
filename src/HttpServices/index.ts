@@ -115,7 +115,13 @@ export const getStudent = async (token: string, checked?: boolean) => {
   const config = getAuthorizationConfig(token);
 
   return await axios.get(
-    `${BASE_URL}admin/student`,
+    `${BASE_URL}admin/student?isArchived=${checked}`,
     config
   );
+};
+export const getStudentById = async (studentId: string) => {
+
+  return await axios.get(
+    `${BASE_URL}admin/studentById?studentId=${studentId}`,
+ );
 };

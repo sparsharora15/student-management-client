@@ -2,14 +2,21 @@ import { Dialog, DialogContent, DialogFooter } from "../ui/dialog";
 import logo from "../../images/logo-dtc.png";
 import { RxAvatar } from "react-icons/rx";
 import QRCode from "react-qr-code";
+import { Student } from "../../Utils/interface";
+import { formatDate } from "../../Utils/helper";
 var Barcode = require("react-barcode");
 
-interface AddEditOrganization {
+interface ViewIdCardProps {
   open: boolean;
+  studentData?: Student;
   onOpenChange: () => void;
 }
 
-const StudentIDCardPopup = ({ open, onOpenChange }: AddEditOrganization) => {
+const StudentIDCardPopup = ({
+  open,
+  onOpenChange,
+  studentData,
+}: ViewIdCardProps) => {
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
@@ -39,20 +46,39 @@ const StudentIDCardPopup = ({ open, onOpenChange }: AddEditOrganization) => {
               </div>
               <div className="grid grid-cols-3 bg-white px-[1rem] py-2 gap-2">
                 <div className="leading-[1.2rem] col-span-2">
-                  <p className="font-bold text-red-600">Sparsh Arora</p>
+                  <p className="font-bold text-red-600">
+                    {studentData?.fullName}
+                  </p>
                   <p className="font-semibold">Course : BCA</p>
-                  <p className="font-semibold">Enrolment No : 02918002021</p>
-                  <p className="font-semibold">F/Name : Suresh Arora</p>
                   <p className="font-semibold">
-                    Address : Madanpuri colony, chilkana road , Saharanpur
+                    Enrolment No : {studentData?.erollmentNo}
+                  </p>
+                  <p className="font-semibold">F/Name : {studentData?.fName}</p>
+                  <p className="font-semibold">
+                    Address : {studentData?.address}
                     247001
                   </p>
-                  <p className="font-semibold">Phone No : 8433014744</p>
-                  <p className="font-semibold">B.Group : O +</p>
-                  <p className="font-semibold">DOB : 15-02-2003</p>
+                  <p className="font-semibold">
+                    Phone No : {studentData?.phoneNo}
+                  </p>
+                  <p className="font-semibold">
+                    B.Group : {studentData?.bloodGroup}
+                  </p>
+                  <p className="font-semibold">
+                    DOB : {formatDate(studentData?.dob)}
+                  </p>
                 </div>
-                <div className="border">
-                  <RxAvatar className="w-full h-full" />
+                <div className="border flex items-center justify-center">
+                  {studentData?.profilePicturePublicId ? (
+                    <img
+                      className="w-[80px] h-[80px]"
+                      src={studentData?.profilePicturePublicId}
+                      alt="profile picture"
+                      style={{ aspectRatio: "1", objectFit: "contain" }}
+                    />
+                  ) : (
+                    <RxAvatar className="w-[80px] h-[80px]" />
+                  )}
                 </div>
               </div>
               <div className="w-full justify-center flex gap-2 px-[1rem] items-center ">
@@ -66,7 +92,6 @@ const StudentIDCardPopup = ({ open, onOpenChange }: AddEditOrganization) => {
                   />
                   ,
                 </div>
-
               </div>
             </div>
           </div>

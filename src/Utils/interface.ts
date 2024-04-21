@@ -37,7 +37,29 @@ export interface LectureInput {
   recessTimeFrom: string;
   recessTimeTo: string;
 }
+interface Course {
+  _id: string;
+  fullName: string;
+}
 
+export interface Student {
+  _id: string;
+  dob: string;
+  gender: string;
+  erollmentNo: string;
+  course: Course;
+  profilePicturePublicId: string;
+  role: string;
+  address: string;
+  fullName: string;
+  bloodGroup: string;
+  email: string;
+  fName: string;
+  phoneNo: string;
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+}
 export interface dropDownValues {
   value: string;
   label: string;

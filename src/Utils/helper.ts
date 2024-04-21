@@ -183,6 +183,5 @@ export const getBase64 = (file: any) => {
 };
 export const isNotFutureDate = (inputDate: Date): boolean => {
   const currentDate = new Date();
-  console.log(inputDate <= currentDate)
   return inputDate <= currentDate;
 };

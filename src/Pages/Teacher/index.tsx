@@ -15,14 +15,22 @@ import { useNavigate } from "react-router-dom";
 import { Teacher, TeachingDepartment } from "../../Utils/interface";
 import { toast } from "../../Components/ui/use-toast";
 
-export const TeachingDepartmentRenderer = (props: TeachingDepartment[]) => {
+export const TeachingDepartmentRenderer = (
+props: TeachingDepartment | TeachingDepartment[]
+) => {
   return (
     <>
-      {props.map((element: TeachingDepartment, id) => (
-        <Badge title={element.fullName} key={id}>
-          {element.fullName}
-        </Badge>
-      ))}
+      <>
+        {Array.isArray(props) ? (
+          props.map((element: TeachingDepartment, id) => (
+            <Badge title={element.fullName} key={id}>
+              {element.fullName}
+            </Badge>
+          ))
+        ) : (
+          <Badge title={props?.fullName}>{props?.fullName}</Badge>
+        )}
+      </>
     </>
   );
 };
@@ -90,7 +98,7 @@ const Teachers = () => {
             label: "Edit",
             className: "",
             callback: () => {
-              setTeacherId(gridParams.data._id)
+              setTeacherId(gridParams.data._id);
               getData(gridParams.data._id);
               setTeacherPopup(true);
             },
