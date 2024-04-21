@@ -100,7 +100,6 @@ const TimeSlots = () => {
   const getSlots = async () => {
     try {
       const response = await getLectures(token as string);
-      console.log(response.status === 200);
       if (response.status === 200) {
         setLectures(response.data?.data[0].lectures);
       }

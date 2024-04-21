@@ -268,7 +268,6 @@ const AddEditTeacher = ({
         form.setValue("gender", genderOptions[1]);
         setSelectedGenderValue(genderOptions[1] as dropDownValues);
       }
-      console.log(newTeachingDepartment);
       if (teacherData?.profilePicturePublicId) {
         setUserPicture(teacherData?.profilePicturePublicId as string);
       }
@@ -282,7 +281,6 @@ const AddEditTeacher = ({
         setSelectedValue(dropDownValues[1]);
       }
     }
-    console.log(teacherData);
   }, [teacherData]);
   useEffect(() => {
     if (departmentOptions) {

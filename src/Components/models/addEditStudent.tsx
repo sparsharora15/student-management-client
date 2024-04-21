@@ -18,16 +18,19 @@ import {
 } from "../../Utils/regex";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { crateStudent } from "../../HttpServices";
 import Dropzone from "../ComonComponents/Dropzone";
 import { CourseData, dropDownValues } from "../../Utils/interface";
 import { Input } from "../ui/input";
 import { DatePicker } from "../ComonComponents/datePicker";
 import SelectDropdown from "../ComonComponents/selectDropdown";
+import { toast } from "../ui/use-toast";
 import { getCourses } from "../../HttpServices";
 
 interface AddEditStudentProps {
   open: boolean;
   onOpenChange: () => void;
+  getAllStudentsData: () => void;
 }
 const validationSchema = z.object({
   dob: z.union([
@@ -39,10 +42,6 @@ const validationSchema = z.object({
   ]),
 
   gender: z.object({
-    label: z.string(),
-    value: z.string(),
-  }),
-  setActive: z.object({
     label: z.string(),
     value: z.string(),
   }),
@@ -61,10 +60,7 @@ const validationSchema = z.object({
   bloodGroup: z
     .string()
     .min(1, { message: "Blood group is required" })
-    .max(255, { message: "User Name must be at most 255 characters" })
-    .refine((value) => validateUserName(value), {
-      message: "Special characters are not allowed in the user name.",
-    }),
+    .max(255, { message: "User Name must be at most 255 characters" }),
   email: z
     .string()
     .min(1, { message: "User Email is required." })
@@ -80,7 +76,7 @@ const validationSchema = z.object({
       return !value || (value.length >= 10 && validatePhoneNumber(value));
     }),
 });
-const AddEditStudent = ({ onOpenChange, open }: AddEditStudentProps) => {
+const AddEditStudent = ({ onOpenChange, open ,getAllStudentsData}: AddEditStudentProps) => {
   const dropDownValues: dropDownValues[] = [
     {
       value: "Yes",
@@ -127,7 +123,6 @@ const AddEditStudent = ({ onOpenChange, open }: AddEditStudentProps) => {
     resolver: zodResolver(validationSchema),
     defaultValues: {
       dob: dob as Date,
-      setActive: undefined,
       gender: undefined,
       course: undefined,
       address: "",
@@ -139,8 +134,35 @@ const AddEditStudent = ({ onOpenChange, open }: AddEditStudentProps) => {
   });
   const onSubmit = async (values: z.infer<typeof validationSchema>) => {
     try {
+      setLoading(true);
+      const {  course, gender, ...rest } = values;
+         const newCourse = course.value
+
+      const formData = new FormData();
+      formData.append("profilePicture", userPicture as File);
+
+      const payload = {
+        ...rest,
+        gender: gender.value,
+        course: newCourse,
+      };
+
+      const res = await (popupType === "add"
+        ? crateStudent(token as string, formData, payload)
+        :crateStudent(token as string, formData, payload) );
+
+      if (res.data.status === 200) {
+        toast({
+          variant: "success",
+          title: res.data.message,
+        });
+        onOpenChange()
+        getAllStudentsData();
+      }
     } catch (err) {
       console.warn(err);
+    }finally{
+      setLoading(false);
     }
   };
   const getCoursesList = async () => {
@@ -156,9 +178,6 @@ const AddEditStudent = ({ onOpenChange, open }: AddEditStudentProps) => {
       setLoading(false);
     }
   };
-  useEffect(() => {
-    form.setValue("setActive", selectedValue);
-  }, [selectedValue]);
   useEffect(() => {
     getCoursesList();
   }, []);
@@ -187,8 +206,8 @@ const AddEditStudent = ({ onOpenChange, open }: AddEditStudentProps) => {
               <div className="w-full  flex flex-col">
                 <p className="text-[#1E293B] font-semibold text-[24px]">
                   {popupType === "edit"
-                    ? "Update Teacher Details"
-                    : "Add Teacher Details"}
+                    ? "Update Student Details"
+                    : "Add Student Details"}
                 </p>
 
                 <div className="grid grid-cols-3 gap-5">
@@ -333,29 +352,6 @@ const AddEditStudent = ({ onOpenChange, open }: AddEditStudentProps) => {
                       </FormItem>
                     )}
                   />
-
-                  <FormField
-                    control={form.control}
-                    name="setActive"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel htmlFor="setActive">
-                          Set Active<span className="text-red-500">*</span>
-                        </FormLabel>
-                        <FormControl>
-                          <SelectDropdown
-                            options={dropDownValues}
-                            onChange={(selectedOption: any) => {
-                              setSelectedValue(selectedOption);
-                            }}
-                            // @ts-ignore
-                            value={selectedValue || null}
-                            placeholder="Select an option"
-                          />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
                   <FormField
                     control={form.control}
                     name="gender"
@@ -402,8 +398,8 @@ const AddEditStudent = ({ onOpenChange, open }: AddEditStudentProps) => {
               <div className=" grid grid-cols-2 gap-4"></div>
               <div className="w-full flex flex-row items-center justify-start mt-2 gap-2">
                 <DialogFooter className="flex gap-2 flex-row">
-                  <Button disabled={false} type="submit" onClick={() => {}}>
-                    {false ? <Loader /> : "Save"}
+                  <Button disabled={loading} type="submit" onClick={() => {}}>
+                    {loading ? <Loader /> : "Save"}
                   </Button>
                   <Button
                     className="bg-[#FFFFFF] text-[#1E293B] border hover:bg-[#FFFFFF] hover:text-[#1E293B]"

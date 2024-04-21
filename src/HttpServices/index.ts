@@ -100,3 +100,28 @@ export const getLectures = async (token: string) => {
 
   return await axios.get(`${BASE_URL}admin/getLectures`, config);
 };
+export const crateStudent = async (
+  token: string,
+  formData: FormData,
+  payload: any
+) => {
+  const config = getAuthorizationConfig(token);
+  Object.entries(payload).forEach(([key, value]) => {
+    formData.append(key, JSON.stringify(value));
+  });
+  return await axios.post(`${BASE_URL}admin/student`, formData, config);
+};
+export const getStudent = async (token: string, checked?: boolean) => {
+  const config = getAuthorizationConfig(token);
+
+  return await axios.get(
+    `${BASE_URL}admin/student?isArchived=${checked}`,
+    config
+  );
+};
+export const getStudentById = async (studentId: string) => {
+
+  return await axios.get(
+    `${BASE_URL}admin/studentById?studentId=${studentId}`,
+ );
+};

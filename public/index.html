@@ -16,13 +16,32 @@
     -->
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
     <script>
-      window.addEventListener('error', function (e) {
-       console.error(e);
-          // prevent React's listener from firing
-      //  e.stopImmediatePropagation();
-      //    // prevent the browser's console error message
-      //  e.preventDefault();
-    });
+      function debounce(func, wait, immediate) {
+        let timeout;
+        return function () {
+          const context = this,
+            args = arguments;
+          const later = function () {
+            timeout = null;
+            if (!immediate) func.apply(context, args);
+          };
+          const callNow = immediate && !timeout;
+          clearTimeout(timeout);
+          timeout = setTimeout(later, wait);
+          if (callNow) func.apply(context, args);
+        };
+      }
+
+      window.addEventListener("error", function (e) {
+        console.error(e);
+        // prevent React's listener from firing
+        e.stopImmediatePropagation();
+        //  prevent the browser's console error message
+        e.preventDefault();
+      });
+      const handleResize = debounce(() => {}, 200);
+
+      window.addEventListener("resize", handleResize);
     </script>
     <!--
       Notice the use of %PUBLIC_URL% in the tags above.

@@ -58,7 +58,6 @@ const AddEditLectureSlots = ({ open, onOpenChange }: AddEditLectureSlot) => {
     try {
       setLoading(true);
       const response = await createLecture(token as string, values);
-      console.log(response.status === 201);
       if (response.status === 201) {
         toast({
           variant: "success",
