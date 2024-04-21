@@ -24,7 +24,7 @@ const ViewStudentProfile = () => {
       const response = await getStudentById(id as string);
       if (response.data.status === 200) {
         console.log(response?.data.data);
-        setStudentData(response?.data.data);
+        setStudentData(response?.data.data?.student);
       }
     } catch (err) {
       console.warn(err);
