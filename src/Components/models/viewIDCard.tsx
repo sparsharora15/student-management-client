@@ -73,26 +73,19 @@ const StudentIDCardPopup = ({
                 <div className="border flex items-center justify-center">
                   {studentData?.profilePicturePublicId ? (
                     <img
-                      className="w-[80px] h-[80px]"
+                      className="w-full h-full"
                       src={studentData?.profilePicturePublicId}
                       alt="profile picture"
-                      style={{ aspectRatio: "1", objectFit: "contain" }}
+                      style={{ aspectRatio: "1", objectFit: "fill" }}
                     />
                   ) : (
                     <RxAvatar className="w-[80px] h-[80px]" />
                   )}
                 </div>
               </div>
-              <div className="w-full justify-center flex gap-2 px-[1rem] items-center ">
-                <div className="h-[50px] w-[50px] flex">
+              <div className="w-full justify-start flex gap-2 px-[1rem] items-center ">
+                <div className="h-[100px] w-[100px] flex">
                   <img src={qrCode} alt="QR code" className="h-full w-full" />
-                </div>
-                <div className="h-[50px] w-[14rem]">
-                  <Barcode
-                    className="h-full w-full"
-                    value="http://github.com/kciter"
-                  />
-                  ,
                 </div>
               </div>
             </div>

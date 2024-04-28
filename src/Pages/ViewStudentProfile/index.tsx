@@ -49,12 +49,12 @@ const ViewStudentProfile = () => {
           <div className="flex flex-row justify-between items-center flex-1 ">
             <div className=" flex gap-3 items-center">
               {studentData?.profilePicturePublicId ? (
-                <div className="border w-[100px] h-[100px] flex items-center justify-center p-2">
+                <div className="border w-[100px] h-[100px] flex items-center justify-center ">
                   <img
                     className="w-full h-full"
                     src={studentData?.profilePicturePublicId}
                     alt="profile picture"
-                    style={{ aspectRatio: "1", objectFit: "contain" }}
+                    style={{ aspectRatio: "1", objectFit: "fill" }}
                   />
                 </div>
               ) : (
