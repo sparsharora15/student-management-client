@@ -10,11 +10,13 @@ interface ViewIdCardProps {
   open: boolean;
   studentData?: Student;
   onOpenChange: () => void;
+  qrCode?: string;
 }
 
 const StudentIDCardPopup = ({
   open,
   onOpenChange,
+  qrCode,
   studentData,
 }: ViewIdCardProps) => {
   return (
@@ -83,7 +85,7 @@ const StudentIDCardPopup = ({
               </div>
               <div className="w-full justify-center flex gap-2 px-[1rem] items-center ">
                 <div className="h-[50px] w-[50px] flex">
-                  <QRCode className="h-full w-full" value="hey" />
+                  <img src={qrCode} alt="QR code" className="h-full w-full" />
                 </div>
                 <div className="h-[50px] w-[14rem]">
                   <Barcode

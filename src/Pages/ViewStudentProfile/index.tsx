@@ -18,13 +18,13 @@ const ViewStudentProfile = () => {
   const [openViewIDCardPopup, setOpenViewIDCardPopup] =
     useState<boolean>(false);
   const [studentData, setStudentData] = useState<Student>();
-
+  const [qrCode, setQrCode] = useState("");
   const getStudentData = async () => {
     try {
       const response = await getStudentById(id as string);
       if (response.data.status === 200) {
-        console.log(response?.data.data);
         setStudentData(response?.data.data?.student);
+        setQrCode(response?.data.data?.qrCodeImage)
       }
     } catch (err) {
       console.warn(err);
@@ -34,7 +34,6 @@ const ViewStudentProfile = () => {
   useEffect(() => {
     getStudentData();
   }, []);
-
 
   return (
     <>
@@ -50,9 +49,7 @@ const ViewStudentProfile = () => {
           <div className="flex flex-row justify-between items-center flex-1 ">
             <div className=" flex gap-3 items-center">
               {studentData?.profilePicturePublicId ? (
-                <div
-                  className="border w-[100px] h-[100px] flex items-center justify-center p-2"
-                >
+                <div className="border w-[100px] h-[100px] flex items-center justify-center p-2">
                   <img
                     className="w-full h-full"
                     src={studentData?.profilePicturePublicId}
@@ -173,6 +170,7 @@ const ViewStudentProfile = () => {
       />
       <StudentIDCardPopup
         open={openViewIDCardPopup}
+        qrCode={qrCode}
         onOpenChange={() => setOpenViewIDCardPopup(false)}
         studentData={studentData as Student}
       />

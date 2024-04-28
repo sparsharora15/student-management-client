@@ -34,10 +34,7 @@ function App() {
               path="/students"
               element={<Protected Components={<Students />} />}
             />
-            <Route
-              path="/view/:id"
-              element={<Protected Components={<ViewStudentProfile />} />}
-            />
+            <Route path="/view/:id" element={<ViewStudentProfile />} />
             <Route
               path="/teacher/view/:id"
               element={<Protected Components={<ViewTecaherProfile />} />}
