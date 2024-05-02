@@ -12,8 +12,10 @@ import { getStudent } from "../../HttpServices";
 import { formatDate } from "../../Utils/helper";
 import { TeachingDepartmentRenderer } from "../Teacher";
 import { TeachingDepartment } from "../../Utils/interface";
+import { Roles } from "../../Utils/enum";
 
 const Students = () => {
+  const role = localStorage.getItem("role");
   const [showTeacherPopup, setTeacherPopup] = useState(false);
   const [action, setAction] = useState("");
   const [checked, setChecked] = useState<Boolean>(false);
@@ -44,6 +46,7 @@ const Students = () => {
           {
             title: "Edit",
             label: "Edit",
+            hide: role === Roles.TEACHER,
             className: "",
             callback: () => {
               setTeacherPopup(true);
@@ -63,6 +66,7 @@ const Students = () => {
             label: gridParams?.data?.isDeleted ? "Unarchive" : "Archive",
             className: "text-red-500",
             callback: deleteUser,
+            hide: role === Roles.TEACHER,
           },
         ].filter(Boolean)}
       />
@@ -109,7 +113,7 @@ const Students = () => {
         flex: 1,
         sortable: false,
         cellRenderer: (gridProps: any) => {
-          return TeachingDepartmentRenderer(gridProps.data.course  );
+          return TeachingDepartmentRenderer(gridProps.data.course);
         },
       },
       {
@@ -181,18 +185,24 @@ const Students = () => {
         <div className="flex gap-3 flex-col lg:flex-row w-full justify-end">
           <div className="flex flex-col md:flex-row  justify-end md:justify-between gap-3">
             <div className="items-center flex gap-2">
-              <Checkbox
-                onCheckedChange={(checked) => {
-                  setChecked(checked as boolean);
-                }}
-                id="archived"
-              />{" "}
-              <Label htmlFor="archived">Show Archived</Label>
+              {role !== Roles.TEACHER && (
+                <>
+                  <Checkbox
+                    onCheckedChange={(checked) => {
+                      setChecked(checked as boolean);
+                    }}
+                    id="archived"
+                  />
+                  <Label htmlFor="archived">Show Archived</Label>
+                </>
+              )}
             </div>
             <div className="w-full lg:w-[200px]">
               <SearchBar placeholder="Search User" />
             </div>
-            <Button onClick={() => setTeacherPopup(true)}>Add Student</Button>
+            {role !== Roles.TEACHER && (
+              <Button onClick={() => setTeacherPopup(true)}>Add Student</Button>
+            )}
           </div>
           {showTeacherPopup && (
             <AddEditStudent

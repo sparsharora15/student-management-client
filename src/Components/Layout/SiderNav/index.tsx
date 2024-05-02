@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { navOptions } from "../../../Utils/helper";
+import { navOptions, teacherNavOptions } from "../../../Utils/helper";
 import { useNavigate } from "react-router-dom";
 import { IconType } from "react-icons";
 import { LuLogOut } from "react-icons/lu";
+import { Roles } from "../../../Utils/enum";
+// import { Roles } from "../../../Utils/";
 
 interface HandleOptionClickProps {
   name: string;
   path: string;
   icon: IconType;
 }
-const SideBar = () => {
+const SideBar = ({ role }: any) => {
   const [activeOption, setActiveOption] = useState<string | null>(
     window?.location?.pathname || null
   );
@@ -31,24 +33,26 @@ const SideBar = () => {
         style={{ height: "calc(100vh - 56px)" }}
       >
         <ul className="flex flex-col py-[10px] px-[18px] gap-[5px] cursor-pointer">
-          {navOptions?.map((el, i) => (
-            <li
-              key={i}
-              onClick={() => handleOptionClick(el)}
-              className={`font-semibold flex items-center gap-3 rounded-[6px] py-[8px] px-[13px] text-[20px] hover:bg-primary text-[#0F172A] hover:text-[#FFFFFF] ${
-                el.path === activeOption ? "bg-primary text-[#FFFFFF]" : ""
-              }`}
-            >
-              {<el.icon />}
-              {el.name}
-            </li>
-          ))}
+          {(role === Roles.ADMIN ? navOptions : teacherNavOptions)?.map(
+            (el, i) => (
+              <li
+                key={i}
+                onClick={() => handleOptionClick(el)}
+                className={`font-semibold flex items-center gap-3 rounded-[6px] py-[8px] px-[13px] text-[20px] hover:bg-primary text-[#0F172A] hover:text-[#FFFFFF] ${
+                  el.path === activeOption ? "bg-primary text-[#FFFFFF]" : ""
+                }`}
+              >
+                {<el.icon />}
+                {el.name}
+              </li>
+            )
+          )}
         </ul>
         <ul className="flex flex-col py-[10px] px-[18px] gap-[5px] cursor-pointer">
           <li
             onClick={() => {
               localStorage.removeItem("adminToken");
-              navigate('/login')
+              navigate("/login");
             }}
             className={`font-semibold flex items-center gap-3 rounded-[6px] py-[8px] px-[13px] text-[20px] hover:bg-primary text-[#0F172A] hover:text-[#FFFFFF] `}
           >

@@ -11,17 +11,21 @@ const Layout = () => {
     decodeToken().then((res) => {
       if (res?.isDecode === false) {
         setRole(Roles.STUDENT);
+        localStorage.setItem('role',Roles.STUDENT)
       } else {
         // @ts-ignore
         setRole(res.deCodedToken?.payload?.user?.role);
+        // @ts-ignore
+        localStorage.setItem('role',res.deCodedToken?.payload?.user?.role)
       }
     });
   }, []);
   return (
     <>
-      {role === (Roles.ADMIN || Roles.TEACHERR) && <Header />}
+      {role === Roles.ADMIN || (role === Roles.TEACHER && <Header />)}
+
       <div className={"flex h-[calc(100vh-56px)]"}>
-        {role === (Roles.ADMIN || Roles.TEACHERR) && <SideBar />}
+        {role === Roles.ADMIN || (role === Roles.TEACHER && <SideBar role={role} />)}
         <div className={"w-full bg-[#E2E8F0] p-5"}>
           <div
             className={

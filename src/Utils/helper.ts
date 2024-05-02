@@ -58,6 +58,24 @@ export const navOptions: { name: string; path: string; icon: IconType }[] = [
     icon: BsFillFileEarmarkSpreadsheetFill,
   },
 ];
+export const teacherNavOptions: { name: string; path: string; icon: IconType }[] = [
+
+  {
+    name: "Students",
+    path: "/students",
+    icon: PiStudentFill,
+  },
+  {
+    name: "Attendance",
+    path: "/studentAttendance",
+    icon: MdCoPresent,
+  },
+  {
+    name: "Student Marks",
+    path: "/studentMarks",
+    icon: BsFillFileEarmarkSpreadsheetFill,
+  },
+];
 
 export const detailedInfoNavOptions = [
   {
