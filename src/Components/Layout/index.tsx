@@ -22,10 +22,10 @@ const Layout = () => {
   }, []);
   return (
     <>
-      {role === Roles.ADMIN || (role === Roles.TEACHER && <Header />)}
+      {(role === Roles.ADMIN || role === Roles.TEACHER) && <Header />}
 
       <div className={"flex h-[calc(100vh-56px)]"}>
-        {role === Roles.ADMIN || (role === Roles.TEACHER && <SideBar role={role} />)}
+        {(role === Roles.ADMIN || role === Roles.TEACHER )&& <SideBar role={role} />}
         <div className={"w-full bg-[#E2E8F0] p-5"}>
           <div
             className={
