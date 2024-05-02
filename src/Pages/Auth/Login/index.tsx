@@ -61,7 +61,7 @@ const Login = () => {
       console.log(err.response?.data?.message)
       toast({
         variant: "destructive",
-        title: err?.response?.data?.message,
+        title: "Something went wrong",
       })
     } finally {
       setLoading(false);
