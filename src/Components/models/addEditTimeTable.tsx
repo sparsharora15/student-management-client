@@ -5,6 +5,15 @@ import SelectDropdown from "../ComonComponents/selectDropdown";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
+
+//course data imports
+
+
+
+import { getCourses } from "../../HttpServices";
+import { CourseData } from "../../Utils/interface";
+//
+
 import * as z from "zod";
 
 import {
@@ -18,6 +27,17 @@ import {
 import { validateUserName } from "../../Utils/regex";
 import { Input } from "../ui/input";
 import { dropDownValues } from "../../Utils/interface";
+import axios from "axios";
+import { BASE_URL } from "../../Utils/constants";
+
+// 
+interface Option {
+  value: string;
+  label: string;
+}
+// 
+
+
 interface AddEditTimeTableProps {
   open: boolean;
   onOpenChange: () => void;
@@ -52,6 +72,14 @@ const validationSchema = z.object({
 });
 
 const AddEditTimeTable = ({ open, onOpenChange }: AddEditTimeTableProps) => {
+  // 
+  const token = localStorage.getItem("adminToken");
+  const [courseData, setCourseData] = useState<Option[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+
+
+  // 
+
   const semOptions: dropDownValues[] = [
     {
       value: "1",
@@ -78,6 +106,41 @@ const AddEditTimeTable = ({ open, onOpenChange }: AddEditTimeTableProps) => {
       label: "6",
     },
   ];
+
+  const semDetails = async (details: Option) => {
+    try {
+
+      const response = await axios.get(`${BASE_URL}admin/getSemDetails?courseId=${details.value}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        }
+      },);
+      console.log(response);
+    }
+    catch (err) {
+      console.log(err);
+    }
+  };
+
+  const getCoursesList = async () => {
+    try {
+      setLoading(true);
+      const coursesData = await getCourses(token as string);
+      if (coursesData.data.status === 200) {
+        setCourseData(coursesData.data.documents);
+      }
+    } catch (err) {
+      console.warn(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    getCoursesList();
+  }, []);
+
+
+
   const departmentOptions: dropDownValues[] = [
     {
       value: "bca",
@@ -158,7 +221,7 @@ const AddEditTimeTable = ({ open, onOpenChange }: AddEditTimeTableProps) => {
   const onSubmit = async (values: z.infer<typeof validationSchema>) => {
     try {
       console.log(values);
-    } catch (err) {}
+    } catch (err) { }
   };
 
   return (
@@ -185,10 +248,14 @@ const AddEditTimeTable = ({ open, onOpenChange }: AddEditTimeTableProps) => {
                       </FormLabel>
 
                       <SelectDropdown
-                        options={departmentOptions}
+                        options={courseData?.map((course: any) => ({
+                          value: course?._id,
+                          label: course?.name,
+                        }))}
                         placeholder="please select a value"
                         onChange={(selectedOption: any) => {
-                          form.setValue("course", selectedOption); // Update course value in the form state
+                          form.setValue("course", selectedOption);
+                          semDetails(selectedOption)
                         }}
                         value={form.getValues("course")}
                       />
