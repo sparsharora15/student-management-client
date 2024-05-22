@@ -93,22 +93,24 @@ const Subjects = () => {
   };
   const getAllSub = async () => {
     try {
-      setLoading(true)
+      setLoading(true);
       const response = await getSubject(token as string);
       if (response?.data?.status === 200) {
-        const formattedSubjects = response?.data?.subjects.map((subject: any) => ({
-          ...subject,
-          createdAt: formatDate(subject.createdAt)
-        }));
+        const formattedSubjects = response?.data?.subjects.map(
+          (subject: any) => ({
+            ...subject,
+            createdAt: formatDate(subject.createdAt),
+          })
+        );
         setSubjectsData(formattedSubjects);
       }
     } catch (err) {
       console.warn(err);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   };
-  
+
   useEffect(() => {
     getAllSub();
   }, []);
@@ -133,6 +135,7 @@ const Subjects = () => {
           {subjectsPopup && (
             <AddEditSubjects
               open={subjectsPopup}
+              getAllSub={getAllSub}
               onOpenChange={() => setSubjectsPopup(false)}
             />
           )}
@@ -140,22 +143,22 @@ const Subjects = () => {
       </div>
       <div className="p-[21px] !pt-0">
         {loading ? (
-              <>
-                <div className="w-full h-[58vh] flex justify-center items-center">
-                  <Loader  />
-                </div>
-              </>
-            ) : (
-              <>
-        <AgGrid
-          className="py-8"
-          height="58vh"
-          columnDefs={columnDefs}
-          getRowClass={getRowClass}
-          rowData={subjectsData}
-        />
-        </>
-            )}
+          <>
+            <div className="w-full h-[58vh] flex justify-center items-center">
+              <Loader />
+            </div>
+          </>
+        ) : (
+          <>
+            <AgGrid
+              className="py-8"
+              height="58vh"
+              columnDefs={columnDefs}
+              getRowClass={getRowClass}
+              rowData={subjectsData}
+            />
+          </>
+        )}
 
         {/* <div className="flex w-full justify-end">
               <Pagination

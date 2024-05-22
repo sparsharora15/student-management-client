@@ -1,30 +1,22 @@
-import { Dialog, DialogContent, DialogFooter } from "../ui/dialog";
-import { Button } from "../ui/button";
-import { useEffect, useState } from "react";
-import SelectDropdown from "../ComonComponents/selectDropdown";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import * as z from "zod";
+import SelectDropdown from "../ComonComponents/selectDropdown";
+import { Button } from "../ui/button";
+import { Dialog, DialogContent, DialogFooter } from "../ui/dialog";
 
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "../ui/form";
-import { validateUserName } from "../../Utils/regex";
-import { Input } from "../ui/input";
-import { dropDownValues } from "../../Utils/interface";
-import { createCourse, getSubject } from "../../HttpServices";
-import { Label } from "../ui/label";
 import Loader from "../../Components/loader";
+import { createCourse, getSubject } from "../../HttpServices";
+import { dropDownValues } from "../../Utils/interface";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
 
 interface AddEditCourse {
   open: boolean;
   onOpenChange: () => void;
+  getCoursesList: () => void;
 }
 interface Subject {
   _id: string;
@@ -51,7 +43,11 @@ const validationSchema = z.object({
   semesters: z.array(semester),
 });
 
-const AddEditCourse = ({ open, onOpenChange }: AddEditCourse) => {
+const AddEditCourse = ({
+  open,
+  onOpenChange,
+  getCoursesList,
+}: AddEditCourse) => {
   const token = localStorage.getItem("adminToken");
   const [subjects, setSubjects] = useState<Array<Subject>>([]);
 
@@ -164,9 +160,10 @@ const AddEditCourse = ({ open, onOpenChange }: AddEditCourse) => {
       const res = await createCourse(token as string, transformedValues);
       if (res.data.status === 201 || res.data.status === 200) {
         toast.success(res.data.message);
+        getCoursesList()
         onOpenChange();
       }
-    } catch (err:any) {
+    } catch (err: any) {
       toast.error(err?.response?.data?.message as string);
     } finally {
       setLoading(false);

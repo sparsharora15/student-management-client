@@ -1,21 +1,21 @@
-import { Dialog, DialogContent, DialogFooter } from "../ui/dialog";
-import { Button } from "../ui/button";
-import { useEffect, useState } from "react";
-import SelectDropdown from "../ComonComponents/selectDropdown";
+import React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "react-toastify";
+import SelectDropdown from "../ComonComponents/selectDropdown";
+import { Button } from "../ui/button";
+import { Dialog, DialogContent, DialogFooter } from "../ui/dialog";
 
 //course data imports
 
-
-
-import { getCourses } from "../../HttpServices";
-import { CourseData } from "../../Utils/interface";
+import { getCourses, getSubject, getTeacher } from "../../HttpServices";
 //
 
 import * as z from "zod";
 
+import axios from "axios";
+import { BASE_URL } from "../../Utils/constants";
+import { dropDownValues } from "../../Utils/interface";
 import {
   Form,
   FormControl,
@@ -24,23 +24,24 @@ import {
   FormLabel,
   FormMessage,
 } from "../ui/form";
-import { validateUserName } from "../../Utils/regex";
 import { Input } from "../ui/input";
-import { dropDownValues } from "../../Utils/interface";
-import axios from "axios";
-import { BASE_URL } from "../../Utils/constants";
 
-// 
+//
 interface Option {
   value: string;
   label: string;
 }
-// 
-
-
+//
+interface Lectures {
+  lectureNumber: number;
+  endTime: string;
+  startTime: string;
+  _id: string;
+}
 interface AddEditTimeTableProps {
   open: boolean;
   onOpenChange: () => void;
+  lectures: Lectures[];
 }
 interface Teacher {
   value: string;
@@ -51,6 +52,17 @@ interface Lecture {
   name: string;
   time: string;
 }
+const subjectSchema = z.object({
+  label: z.string(),
+  value: z.string(),
+});
+const lectureSchema = z.object({
+  lectureNumber: z.string(),
+  subject: subjectSchema,
+  teacher: subjectSchema,
+  venue: z.string(),
+});
+
 const validationSchema = z.object({
   course: z.object({
     label: z.string(),
@@ -60,64 +72,41 @@ const validationSchema = z.object({
     label: z.string(),
     value: z.string(),
   }),
-  subject: z.object({
-    label: z.string(),
-    value: z.string(),
-  }),
-  teacher: z.object({
-    label: z.string(),
-    value: z.string(),
-  }),
-  venue: z.string().min(1, { message: "Venue is required" }),
+  lecture: z.array(lectureSchema),
 });
 
-const AddEditTimeTable = ({ open, onOpenChange }: AddEditTimeTableProps) => {
-  // 
+const AddEditTimeTable = ({
+  open,
+  onOpenChange,
+  lectures,
+}: AddEditTimeTableProps) => {
+  //
   const token = localStorage.getItem("adminToken");
   const [courseData, setCourseData] = useState<Option[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-
-
-  // 
-
-  const semOptions: dropDownValues[] = [
-    {
-      value: "1",
-      label: "1",
-    },
-    {
-      value: "2",
-      label: "2",
-    },
-    {
-      value: "3",
-      label: "3",
-    },
-    {
-      value: "4",
-      label: "4",
-    },
-    {
-      value: "5",
-      label: "5",
-    },
-    {
-      value: "6",
-      label: "6",
-    },
-  ];
+  const [semOptions, setSemOptions] = useState<dropDownValues[]>([]);
+  const [subjectsData, setSubjectsData] = useState<dropDownValues[]>([]);
+  const [teachers, setTeachers] = useState<dropDownValues[]>([]);
 
   const semDetails = async (details: Option) => {
     try {
-
-      const response = await axios.get(`${BASE_URL}admin/getSemDetails?courseId=${details.value}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const response = await axios.get(
+        `${BASE_URL}admin/getSemDetails?courseId=${details.value}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
-      },);
-      console.log(response);
-    }
-    catch (err) {
+      );
+      if (response.status === 200) {
+        setSemOptions(
+          response.data.map((sem: { semesterName: string; _id: string }) => ({
+            label: sem.semesterName,
+            value: sem._id,
+          }))
+        );
+      }
+    } catch (err) {
       console.log(err);
     }
   };
@@ -135,93 +124,67 @@ const AddEditTimeTable = ({ open, onOpenChange }: AddEditTimeTableProps) => {
       setLoading(false);
     }
   };
+  const getAllSub = async () => {
+    try {
+      setLoading(true);
+      const response = await getSubject(token as string);
+      if (response?.data?.status === 200) {
+        const formattedSubjects = response?.data?.subjects.map(
+          (subject: { name: string; _id: string }) => ({
+            label: subject.name,
+            value: subject._id,
+          })
+        );
+        setSubjectsData(formattedSubjects);
+      }
+    } catch (err) {
+      console.warn(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getAllTechersData = async () => {
+    try {
+      const res = await getTeacher(token as string);
+      if (res.data.status === 200) {
+        const formattedData = res.data.data.map(
+          (teacher: { fullName: string; _id: string }) => ({
+            label: teacher.fullName,
+            value: teacher._id,
+          })
+        );
+        setTeachers(formattedData);
+      }
+    } catch (err) {
+      console.warn(err);
+    }
+  };
   useEffect(() => {
+    getAllSub();
     getCoursesList();
+    getAllTechersData();
   }, []);
-
-
-
-  const departmentOptions: dropDownValues[] = [
-    {
-      value: "bca",
-      label: "BCA",
-    },
-    {
-      value: "btech",
-      label: "BTech",
-    },
-    {
-      value: "bcom",
-      label: "Bcom",
-    },
-  ];
-  const teacherOptions: Teacher[] = [
-    {
-      value: "smith_math",
-      label: "Mr. Smith - Mathematics",
-    },
-    {
-      value: "john_eng",
-      label: "Ms. John - English",
-    },
-    {
-      value: "doe_sci",
-      label: "Dr. Doe - Science",
-    },
-  ];
-  const subjectOptions: dropDownValues[] = [
-    {
-      value: "math",
-      label: "Mathematics",
-    },
-    {
-      value: "eng",
-      label: "English",
-    },
-    {
-      value: "sci",
-      label: "Science",
-    },
-  ];
-
-  const lectures: Lecture[] = [
-    {
-      id: 1,
-      name: "Lecture 1",
-      time: "9:00 - 9:45",
-    },
-    {
-      id: 2,
-      name: "Lecture 2",
-      time: "10:00 - 10:45",
-    },
-    {
-      id: 3,
-      name: "Lecture 3",
-      time: "11:00 - 11:45",
-    },
-    {
-      id: 4,
-      name: "Lecture 4",
-      time: "11:45 - 12:15",
-    },
-    // Add more lectures as needed
-  ];
   const form = useForm<z.infer<typeof validationSchema>>({
     resolver: zodResolver(validationSchema),
     defaultValues: {
       course: {},
       sem: {},
-      venue: "",
-      subject: {},
-      teacher: {},
+      lecture: [
+        {
+          lectureNumber:"",
+          venue: "",
+          subject: {},
+          teacher: {},
+        },
+      ],
     },
   });
 
   const onSubmit = async (values: z.infer<typeof validationSchema>) => {
     try {
       console.log(values);
-    } catch (err) { }
+    } catch (err) {}
   };
 
   return (
@@ -255,7 +218,7 @@ const AddEditTimeTable = ({ open, onOpenChange }: AddEditTimeTableProps) => {
                         placeholder="please select a value"
                         onChange={(selectedOption: any) => {
                           form.setValue("course", selectedOption);
-                          semDetails(selectedOption)
+                          semDetails(selectedOption);
                         }}
                         value={form.getValues("course")}
                       />
@@ -282,11 +245,11 @@ const AddEditTimeTable = ({ open, onOpenChange }: AddEditTimeTableProps) => {
                     </FormItem>
                   )}
                 />
-                {lectures?.map((lecture: Lecture, key) => {
+                {/* {lectures?.map((lecture: Lectures, index: number) => {
                   return (
-                    <>
+                    <React.Fragment key={index}>
                       <FormLabel className="col-span-3">
-                        {lecture?.name} ({lecture?.time})
+                        {`Lecture ${lecture?.lectureNumber} (${lecture?.startTime} - ${lecture?.endTime})`}
                         <span className="text-red-500">*</span>
                       </FormLabel>
                       <div>
@@ -301,9 +264,12 @@ const AddEditTimeTable = ({ open, onOpenChange }: AddEditTimeTableProps) => {
                               </FormLabel>
                               <FormControl>
                                 <SelectDropdown
-                                  options={subjectOptions}
-                                  onChange={(selectedOption: any) => {
-                                    form.setValue("subject", selectedOption); // Update subject value in the form state
+                                  options={subjectsData}
+                                  onChange={(
+                                    selectedOption: dropDownValues | null
+                                  ) => {
+                                    selectedOption &&
+                                      form.setValue("subject", selectedOption); // Update subject value in the form state
                                   }}
                                   value={form.getValues("subject")}
                                 />
@@ -324,9 +290,12 @@ const AddEditTimeTable = ({ open, onOpenChange }: AddEditTimeTableProps) => {
                               </FormLabel>
                               <FormControl>
                                 <SelectDropdown
-                                  options={teacherOptions}
-                                  onChange={(selectedOption: any) => {
-                                    form.setValue("teacher", selectedOption); // Update teacher value in the form state
+                                  options={teachers}
+                                  onChange={(
+                                    selectedOption: dropDownValues | null
+                                  ) => {
+                                    selectedOption &&
+                                      form.setValue("teacher", selectedOption);
                                   }}
                                   value={form.getValues("teacher")}
                                 />
@@ -345,7 +314,6 @@ const AddEditTimeTable = ({ open, onOpenChange }: AddEditTimeTableProps) => {
                                 Venue<span className="text-red-500">*</span>
                               </FormLabel>
                               <FormControl>
-                                {/* @ts-ignore */}
                                 <Input type="venue" id="Venue" {...field} />
                               </FormControl>
                               <FormMessage />
@@ -353,9 +321,9 @@ const AddEditTimeTable = ({ open, onOpenChange }: AddEditTimeTableProps) => {
                           )}
                         />
                       </div>
-                    </>
+                    </React.Fragment>
                   );
-                })}
+                })} */}
               </div>
             </div>
 

@@ -20,13 +20,14 @@ import Loader from "../loader";
 interface AddEditSubject {
   open: boolean;
   onOpenChange: () => void;
+  getAllSub: () => void;
 }
 
 const validationSchema = z.object({
   fullName: z.string().min(1, { message: "Name is required" }),
 });
 
-const AddEditSubjects = ({ open, onOpenChange }: AddEditSubject) => {
+const AddEditSubjects = ({ open, onOpenChange,getAllSub }: AddEditSubject) => {
   const [loading, setLoading] = useState<boolean>(false);
   const form = useForm<z.infer<typeof validationSchema>>({
     resolver: zodResolver(validationSchema),
@@ -44,9 +45,10 @@ const AddEditSubjects = ({ open, onOpenChange }: AddEditSubject) => {
 
       if (response.data.status === 200) {
         toast.success(response.data.message);
+        getAllSub()
         onOpenChange();
       }
-    } catch (err:unknown | any) {
+    } catch (err: unknown | any) {
       toast.error(err?.response?.data?.message as string);
 
       console.warn(err);

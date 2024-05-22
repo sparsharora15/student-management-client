@@ -16,7 +16,7 @@ import { Teacher, TeachingDepartment } from "../../Utils/interface";
 import { toast } from "../../Components/ui/use-toast";
 
 export const TeachingDepartmentRenderer = (
-props: TeachingDepartment | TeachingDepartment[]
+  props: TeachingDepartment | TeachingDepartment[]
 ) => {
   return (
     <>

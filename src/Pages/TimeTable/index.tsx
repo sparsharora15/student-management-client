@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Button } from "../../Components/ui/button";
 import SearchBar from "../../Components/ComonComponents/searchBar";
 import { Label } from "../../Components/ui/label";
@@ -9,12 +9,22 @@ import { useNavigate } from "react-router-dom";
 import GridActions from "../../Components/gridCellRendrer/GridActions";
 import AgGrid from "../../Components/Grid";
 import AddEditTimeTable from "../../Components/models/addEditTimeTable";
-
+import { getLectures } from "../../HttpServices";
+interface Lectures {
+  lectureNumber: number;
+  endTime: string;
+  startTime: string;
+  _id: string;
+}
 const TimeTable = () => {
+  const token = localStorage.getItem("adminToken");
+
   const [timeTablePopup, setTimeTablePopup] = useState(false);
   const navigate = useNavigate();
   const [action, setAction] = useState("");
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [lectures, setLectures] = useState<Lectures[]>([]);
+
   const deleteUser = useCallback((gridParams: any) => {
     setAction("Archive");
     setIsOpen(true);
@@ -87,12 +97,25 @@ const TimeTable = () => {
     { courseName: "BCOM", sem: "3", totalLectures: 5 },
     // Add more rows as needed
   ];
+  const getSlots = async () => {
+    try {
+      const response = await getLectures(token as string);
+      if (response.status === 200) {
+        setLectures(response.data?.data[0].lectures);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   const getRowClass = (params: any) => {
     if (params?.data?.isDeleted) {
       return "!bg-red-50";
     }
   };
+  useEffect(() => {
+    getSlots();
+  }, []);
   return (
     <>
       <div className="p-[21px] !pb-0 flex flex-col lg:flex-row items-center justify-between gap-4">
@@ -116,6 +139,7 @@ const TimeTable = () => {
           {timeTablePopup && (
             <AddEditTimeTable
               open={timeTablePopup}
+              lectures={lectures}
               onOpenChange={() => setTimeTablePopup(false)}
             />
           )}

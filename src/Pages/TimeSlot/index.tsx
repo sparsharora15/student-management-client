@@ -8,10 +8,10 @@ import GridActions from "../../Components/gridCellRendrer/GridActions";
 import AgGrid from "../../Components/Grid";
 import AddEditLectureSlots from "../../Components/models/addEditLectureSlots";
 import { getLectures } from "../../HttpServices";
-interface Lectures{
-  lectureNumber:number
-  endTime:string
-  startTime:string
+interface Lectures {
+  lectureNumber: number;
+  endTime: string;
+  startTime: string;
 }
 const TimeSlots = () => {
   const [lecturePopup, setLecturePopup] = useState(false);
@@ -107,23 +107,6 @@ const TimeSlots = () => {
       console.log(err);
     }
   };
-  const rowData = [
-    {
-      lecture: "1",
-      from: "09:00 AM",
-      to: "10:30 AM",
-    },
-    {
-      lecture: "2",
-      from: "11:00 AM",
-      to: "12:30 PM",
-    },
-    {
-      lecture: "3",
-      from: "01:00 PM",
-      to: "02:30 PM",
-    },
-  ];
 
   const getRowClass = (params: any) => {
     if (params?.data?.isDeleted) {
@@ -133,6 +116,9 @@ const TimeSlots = () => {
   useEffect(() => {
     getSlots();
   }, []);
+  useEffect(() => {
+    console.log("lectures", lectures);
+  }, [lectures]);
   return (
     <>
       <div className="p-[21px] !pb-0 flex flex-col lg:flex-row items-center justify-between gap-4">
@@ -156,6 +142,7 @@ const TimeSlots = () => {
           {lecturePopup && (
             <AddEditLectureSlots
               open={lecturePopup}
+              getSlots={getSlots}
               onOpenChange={() => setLecturePopup(false)}
             />
           )}

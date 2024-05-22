@@ -176,6 +176,7 @@ const Course = () => {
 
           {coursePopup && (
             <AddEditCourse
+            getCoursesList={getCoursesList}
               open={coursePopup}
               onOpenChange={() => setCoursePopup(false)}
             />

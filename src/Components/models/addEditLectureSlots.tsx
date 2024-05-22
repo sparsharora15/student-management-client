@@ -23,6 +23,7 @@ import { toast } from "../ui/use-toast";
 interface AddEditLectureSlot {
   open: boolean;
   onOpenChange: () => void;
+  getSlots: () => void;
 }
 
 const validationSchema = z.object({
@@ -40,7 +41,11 @@ const validationSchema = z.object({
   recessTimeTo: z.string().min(1, { message: "Recess time to is required " }),
 });
 
-const AddEditLectureSlots = ({ open, onOpenChange }: AddEditLectureSlot) => {
+const AddEditLectureSlots = ({
+  open,
+  onOpenChange,
+  getSlots,
+}: AddEditLectureSlot) => {
   const token = localStorage.getItem("adminToken");
   const [loading, setLoading] = useState<boolean>(false);
   const form = useForm<z.infer<typeof validationSchema>>({
@@ -63,13 +68,13 @@ const AddEditLectureSlots = ({ open, onOpenChange }: AddEditLectureSlot) => {
           variant: "success",
           title: response?.data.message,
         });
-        onOpenChange()
+        onOpenChange();
       }
-    } catch (err:any) {
+    } catch (err: any) {
       toast({
         variant: "destructive",
         // @ts-ignore
-        title: err?.response?.data.message ,
+        title: err?.response?.data.message,
       });
       console.warn(err);
     } finally {
@@ -238,7 +243,8 @@ const AddEditLectureSlots = ({ open, onOpenChange }: AddEditLectureSlot) => {
                               field.onChange("");
                               toast({
                                 variant: "destructive",
-                                title: "Recess time should be within college hours",
+                                title:
+                                  "Recess time should be within college hours",
                               });
                             }
                           }}
